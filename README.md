@@ -14,4 +14,7 @@
 
 ##IMPLEMENTATION OF A DEEP LEARNING MODEL FOR IMAGE CLASSIFICATION USING TENSORFLOW OR PYTORCH WITH VISUALIZATION OF RESULTS.
 
+OUTPUT 
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/43d1e579-988f-439c-a6ea-1e663e64fd9a" />      
+
  
