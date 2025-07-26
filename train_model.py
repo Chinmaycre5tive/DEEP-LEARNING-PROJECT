@@ -1,17 +1,13 @@
-# image_classification_pytorch.py
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
-import numpy as np
 
 # 1. Data Preparation
 transform = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # For RGB images
 ])
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
@@ -35,7 +31,6 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(3, 32, 3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2, 2),
-
             nn.Conv2d(32, 64, 3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2, 2),
@@ -59,8 +54,6 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # 4. Training Loop
-train_losses, test_losses = [], []
-
 for epoch in range(10):
     running_loss = 0.0
     model.train()
@@ -74,42 +67,12 @@ for epoch in range(10):
         optimizer.step()
 
         running_loss += loss.item()
-    
-    train_losses.append(running_loss / len(trainloader))
-    print(f"Epoch {epoch+1} - Training Loss: {train_losses[-1]:.4f}")
 
-    # Test loss
-    model.eval()
-    test_loss = 0.0
-    with torch.no_grad():
-        for inputs, labels in testloader:
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            test_loss += loss.item()
-    test_losses.append(test_loss / len(testloader))
+    avg_loss = running_loss / len(trainloader)
+    print(f"Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
-print('Finished Training')
+print("Finished training.")
 
-# 5. Visualization
-plt.plot(train_losses, label='Training Loss')
-plt.plot(test_losses, label='Test Loss')
-plt.title('Loss over Epochs')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-
-# 6. Test Accuracy
-correct = 0
-total = 0
-model.eval()
-with torch.no_grad():
-    for inputs, labels in testloader:
-        inputs, labels = inputs.to(device), labels.to(device)
-        outputs = model(inputs)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-print(f'Test Accuracy: {100 * correct / total:.2f}%')
+# 5. Save the trained model
+torch.save(model.state_dict(), 'simple_cnn.pth')
+print("Model saved as simple_cnn.pth")
